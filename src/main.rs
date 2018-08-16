@@ -9,10 +9,21 @@ use rtracer::ray::Ray;
 use rtracer::sphere::Sphere;
 use rtracer::vec3::Vec3;
 
+fn random_in_unit_sphere() -> Vec3 {
+    let mut p = Vec3::new(random::<f64>(), random::<f64>(), random::<f64>()).scale_up(2.0)
+        - Vec3::new(1.0, 1.0, 1.0);
+    while p.squared_length() >= 1.0 {
+        p = Vec3::new(random::<f64>(), random::<f64>(), random::<f64>()).scale_up(2.0)
+            - Vec3::new(1.0, 1.0, 1.0);
+    }
+    p
+}
+
 fn color(r: &Ray, world: &dyn Hittable) -> Vec3 {
     let mut rec = HitRecord::default();
-    if world.hit(r, 0.0, MAX, &mut rec) {
-        return Vec3::new(rec.normal.x() + 1.0, rec.normal.y() + 1.0, rec.normal.z() + 1.0).scale_up(0.5);
+    if world.hit(r, 0.001, MAX, &mut rec) {
+        let target = rec.p + rec.normal + random_in_unit_sphere();
+        return color(&Ray::new(rec.p, target - rec.p), world).scale_up(0.5);
     } else {
         let unit_direction = Vec3::unit_vector(r.direction());
         let t = 0.5 * (unit_direction.y() + 1.0);
@@ -42,6 +53,7 @@ fn main() {
                 col += color(&r, &world);
             }
             col.scale_down_assign(f64::from(num_samples));
+            col = Vec3::new(col.r().sqrt(), col.g().sqrt(), col.b().sqrt());
             let int_r = (255.99 * col.r()).trunc() as i32;
             let int_g = (255.99 * col.g()).trunc() as i32;
             let int_b = (255.99 * col.b()).trunc() as i32;
