@@ -40,21 +40,25 @@ fn main() {
     println!("255");
     let first_matte_sphere = Sphere::new(Vec3::new(0.0, 0.0, -1.0),
                                          0.5,
-                                         Material::Lambertian { albedo: Vec3::new(0.8, 0.3, 0.3) });
+                                         Material::Lambertian { albedo: Vec3::new(0.1, 0.2, 0.5) });
     let second_matte_sphere = Sphere::new(Vec3::new(0.0, -100.5, -1.0),
                                           100.0,
                                           Material::Lambertian { albedo: Vec3::new(0.8, 0.8, 0.0) });
-    let first_metal_sphere = Sphere::new(Vec3::new(1.0, 0.0, -1.0),
+    let metal_sphere = Sphere::new(Vec3::new(1.0, 0.0, -1.0),
+                                   0.5,
+                                   Material::new_metal(Vec3::new(0.8, 0.6, 0.2), 1.0));
+    let glass_sphere_outer = Sphere::new(Vec3::new(-1.0, 0.0, -1.0),
                                          0.5,
-                                         Material::new_metal(Vec3::new(0.8, 0.6, 0.2), 1.0));
-    let second_metal_sphere = Sphere::new(Vec3::new(-1.0, 0.0, -1.0),
-                                          0.5,
-                                          Material::new_metal(Vec3::new(0.8, 0.8, 0.8), 0.3));
+                                         Material::Dielectric { ref_idx: 1.5 });
+    let glass_sphere_inner = Sphere::new(Vec3::new(-1.0, 0.0, -1.0),
+                                         -0.45,
+                                         Material::Dielectric { ref_idx: 1.5 });
     let spheres = vec![
         &first_matte_sphere as &dyn Hittable,
         &second_matte_sphere as &dyn Hittable,
-        &first_metal_sphere as &dyn Hittable,
-        &second_metal_sphere as &dyn Hittable];
+        &metal_sphere as &dyn Hittable,
+        &glass_sphere_outer as &dyn Hittable,
+        &glass_sphere_inner as &dyn Hittable];
     let world = HittableList::new(spheres);
     let cam = Camera::default();
     for j in (0..num_y).rev() {
