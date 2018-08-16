@@ -1,3 +1,4 @@
+use material::Material;
 use ray::Ray;
 use vec3::Vec3;
 
@@ -6,11 +7,12 @@ pub struct HitRecord {
     pub t: f64,
     pub p: Vec3,
     pub normal: Vec3,
+    pub mat: Option<Material>,
 }
 
 impl<'a> Default for HitRecord {
     fn default() -> HitRecord {
-        HitRecord { t: 0.0, p: Vec3::default(), normal: Vec3::default() }
+        HitRecord { t: 0.0, p: Vec3::default(), normal: Vec3::default(), mat: None }
     }
 }
 
@@ -50,6 +52,7 @@ impl<'a> Hittable for HittableList<'a> {
                 rec.t = temp_rec.t;
                 rec.p = temp_rec.p;
                 rec.normal = temp_rec.normal;
+                rec.mat = temp_rec.mat;
             }
         }
         hit_anything

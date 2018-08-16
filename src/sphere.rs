@@ -1,15 +1,17 @@
 use hittable::{HitRecord, Hittable};
+use material::Material;
 use ray::Ray;
 use vec3::Vec3;
 
 pub struct Sphere {
     center: Vec3,
     radius: f64,
+    mat: Material,
 }
 
 impl Sphere {
-    pub fn new(center: Vec3, radius: f64) -> Sphere {
-        Sphere { center, radius }
+    pub fn new(center: Vec3, radius: f64, mat: Material) -> Sphere {
+        Sphere { center, radius, mat }
     }
 
     pub fn center(&self) -> Vec3 {
@@ -23,7 +25,7 @@ impl Sphere {
 
 impl Default for Sphere {
     fn default() -> Sphere {
-        Sphere::new(Vec3::default(), 0.0)
+        Sphere::new(Vec3::default(), 0.0, Material::Lambertian { albedo: Vec3::new(1.0, 1.0, 1.0) })
     }
 }
 
@@ -40,6 +42,7 @@ impl Hittable for Sphere {
                 rec.t = temp;
                 rec.p = r.point_at_parameter(rec.t);
                 rec.normal = (rec.p - self.center).scale_down(self.radius);
+                rec.mat = Some(self.mat);
                 return true;
             }
             temp = (-b + (b * b - a * c).sqrt()) / a;
@@ -47,6 +50,7 @@ impl Hittable for Sphere {
                 rec.t = temp;
                 rec.p = r.point_at_parameter(rec.t);
                 rec.normal = (rec.p - self.center).scale_down(self.radius);
+                rec.mat = Some(self.mat);
                 return true;
             }
         }
